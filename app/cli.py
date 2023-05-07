@@ -1,6 +1,6 @@
 from app import app
-import os
 import click
+import os
 
 @app.cli.group()
 def translate():

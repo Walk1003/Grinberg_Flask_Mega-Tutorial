@@ -7,6 +7,7 @@ from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request, g
 from flask_babel import _, get_locale
 from flask_login import login_user, logout_user, current_user, login_required
+from langdetect import detect, LangDetectException
 from werkzeug.urls import url_parse
 
 @app.before_request
@@ -22,7 +23,12 @@ def before_request():
 def index():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(body=form.post.data, author=current_user)
+        try:
+            language = detect(form.post.data)
+        except LangDetectException:
+            language = ''
+        post = Post(body=form.post.data, author=current_user, 
+                    language=language)
         db.session.add(post)
         db.session.commit()
         flash(_('Your post is now live!'))
